@@ -18,9 +18,13 @@ def create_app():
 
     from .views import views
     from .auth import auth
+    from .tasks import tasks
+    from .users import users
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/auth')
+    app.register_blueprint(tasks, url_prefix='/tasks')
+    app.register_blueprint(users, url_prefix='/users')
 
     from .models import User, Task
 

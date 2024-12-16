@@ -5,9 +5,9 @@ This is a task management system that allows you to create, update, and delete t
 ## Technologies
 
 - Python (3.9+)
-- Flask or FastAPI for web framework
+- Flask for web framework
 - SQLAlchemy for ORM
-- SQLite or PostgreSQL for database
+- SQLite for database
 - JWT for authentication
 - Pytest for unit testing
 
@@ -26,8 +26,9 @@ This is a task management system that allows you to create, update, and delete t
 To get started, clone the repository and run the following commands:
 
 ```bash
-npm install
-npm run dev
+cd backend
+pip install -r requirement.txt
+flask run
 ```
 
 ## License

@@ -2,6 +2,7 @@ from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
 from enum import Enum
+from datetime import datetime
 
 # Define the Enums for status and priority
 class TaskStatus(str, Enum):
@@ -21,14 +22,15 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(150), unique=True, nullable=False)
     first_name = db.Column(db.String(150), nullable=False)
     last_name = db.Column(db.String(150), nullable=False)
-    created_at = db.Column(db.DateTime(timezone = True), default=func.now())
+    created_at = db.Column(db.DateTime, default=datetime.now())
     tasks = db.relationship('Task')
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(150), nullable=False)
     description = db.Column(db.String(10000))
-    status = db.Column(db.Enum(TaskStatus), default=TaskStatus.TODO, nullable=False)
-    priority = db.Column(db.Enum(TaskPriority), default=TaskPriority.MEDIUM, nullable=False)
-    created_at = db.Column(db.DateTime(timezone = True), default=func.now())
-    updated_at = db.Column(db.DateTime(timezone = True), default=func.now())
-    user = db.Column(db.Integer, db.ForeignKey('user.id')) 
+    status = db.Column(db.Enum("todo", "in_progress", "completed"), default="todo", nullable=False)
+    priority = db.Column(db.Enum("low", "medium", "high"), default="medium", nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now())
+    updated_at = db.Column(db.DateTime, default=datetime.now())
+    user = db.Column(db.String, db.ForeignKey('user.username')) 

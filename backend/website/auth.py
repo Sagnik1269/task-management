@@ -40,9 +40,9 @@ def login():
     }
     
     access_token = create_access_token(
-        identity=user.id,
+        identity=user.username,
         expires_delta=timedelta(hours=1),
-        additional_claims=additional_claims
+        # additional_claims=additional_claims
     )
 
     response = make_response(jsonify({
@@ -76,26 +76,33 @@ def register():
     first_name = data.get('first_name')
     last_name = data.get('last_name')
 
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-
-    hashed_password_str = hashed_password.decode('utf-8')
-
     if not username or not password or not email or not first_name or not last_name:
-        return {"error": "Missing fields"}, 400
-        
-    # TODO: Add authentication logic here
-    # For now, just return a success message
-    new_user = User(username=username, email=email, first_name=first_name, last_name=last_name, password = hashed_password)
+        return {"error": "Missing field/s"}, 400
+
+    # Check if username exists
+    if User.query.filter_by(username=username).first():
+        return {"error": "Username already exists"}, 409
+
+    # Check if email exists
+    if User.query.filter_by(email=email).first():
+        return {"error": "Email already exists"}, 409
+
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    new_user = User(username=username, email=email, first_name=first_name, last_name=last_name, password=hashed_password)
 
     access_token = create_access_token(
-        identity=new_user.id,  # Use a unique identifier like user ID
-        expires_delta=timedelta(hours=1)  # Token expires in 1 hour
+        identity=new_user.username,
+        expires_delta=timedelta(hours=1)
     )
 
     db.session.add(new_user)
     db.session.commit()
 
-    return {"message": "User registered successfully", "username": username, "access_token" : access_token}, 201
+    response = make_response(jsonify({"message": "User registered successfully", "username": username, "access_token": access_token}))
+
+    response.set_cookie("access_token", access_token)
+
+    return response, 201
 
 
 @auth.route('/logout', methods=['POST'])
